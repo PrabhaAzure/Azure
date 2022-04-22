@@ -1,0 +1,28 @@
+{
+	"name": "Event_trigger_HD",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "HourlyDailyFiles",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"fileName": "@triggerBody.fileName"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/prabhakarcontainer/blobs/input/",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/a62665bb-d7b7-44f6-9081-1e115745da72/resourceGroups/Prabhakar_Test/providers/Microsoft.Storage/storageAccounts/prabhakarkstorage",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"name": "Trigger_copyData",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 12,
+				"startTime": "2022-03-31T05:53:00Z",
+				"endTime": "2022-03-31T05:55:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

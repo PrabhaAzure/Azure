@@ -1,0 +1,227 @@
+{
+	"name": "DF_RankBySales",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DimCustomer_CSV",
+						"type": "DatasetReference"
+					},
+					"name": "DimCustomer"
+				},
+				{
+					"dataset": {
+						"referenceName": "FactSales_CSV",
+						"type": "DatasetReference"
+					},
+					"name": "FactSales"
+				},
+				{
+					"dataset": {
+						"referenceName": "DummyProducts_CSV",
+						"type": "DatasetReference"
+					},
+					"name": "DummyProduct"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CustomerBySalesDS",
+						"type": "DatasetReference"
+					},
+					"name": "FinalLeast10CustomersCSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "CustomerBySalesDS",
+						"type": "DatasetReference"
+					},
+					"name": "FinalTop10CustomersCSV"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "rankBySalesOrderQtyDec"
+				},
+				{
+					"name": "Top10"
+				},
+				{
+					"name": "rankBySalesOrderQtyAsc"
+				},
+				{
+					"name": "Least10"
+				},
+				{
+					"name": "Top10Customers"
+				},
+				{
+					"name": "Least10Customers"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "aggregate2"
+				},
+				{
+					"name": "MaxSalesByProduct"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "TopSalesByProduct"
+				},
+				{
+					"name": "FinalLeast10Customers"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "FinalTop10Customers"
+				},
+				{
+					"name": "TopSalesByProductFinal"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CustomerKey as string,",
+				"          Geographykey as string,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          BirthDate as string,",
+				"          EmailAddress as string,",
+				"          YearlyIncome as string,",
+				"          AddressLine1 as string,",
+				"          Phone as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DimCustomer",
+				"source(output(",
+				"          OrderDate as string,",
+				"          ProductKey as string,",
+				"          CustomerKey as string,",
+				"          OrderQuantity as string,",
+				"          UnitPrice as string,",
+				"          SalesAmount as string,",
+				"          TaxAmt as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> FactSales",
+				"source(output(",
+				"          Product_Key as string,",
+				"          { Product_Name} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> DummyProduct",
+				"FactSales aggregate(groupBy(CustomerKey),",
+				"     SalesAmount = sum(toDecimal(SalesAmount)),",
+				"          OrderQuantity = sum(toInteger(OrderQuantity))) ~> aggregate1",
+				"aggregate1 rank(desc(SalesAmount, true),",
+				"     desc(OrderQuantity, true),",
+				"     asc(CustomerKey, true),",
+				"     output(Rank as long),",
+				"     dense: true) ~> rankBySalesOrderQtyDec",
+				"rankBySalesOrderQtyDec filter(Rank<=10) ~> Top10",
+				"aggregate1 rank(asc(SalesAmount, true),",
+				"     asc(OrderQuantity, true),",
+				"     asc(CustomerKey, true),",
+				"     output(Rank as long),",
+				"     dense: true) ~> rankBySalesOrderQtyAsc",
+				"rankBySalesOrderQtyAsc filter(Rank<=10) ~> Least10",
+				"DimCustomer, Top10 join(DimCustomer@CustomerKey == aggregate1@CustomerKey,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> Top10Customers",
+				"DimCustomer, Least10 join(DimCustomer@CustomerKey == aggregate1@CustomerKey,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> Least10Customers",
+				"FactSales, DummyProduct join(ProductKey == Product_Key,",
+				"     joinType:'left',",
+				"     broadcast: 'auto')~> join1",
+				"join1 aggregate(groupBy({ Product_Name},",
+				"          CustomerKey),",
+				"     SalesAmount = sum(toDecimal(SalesAmount))) ~> aggregate2",
+				"aggregate2 window(over(CustomerKey),",
+				"     desc(SalesAmount, true),",
+				"     D_Rank = denseRank()) ~> MaxSalesByProduct",
+				"Least10Customers, TopSalesByProductFinal join(DimCustomer@CustomerKey == aggregate2@CustomerKey,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> join2",
+				"MaxSalesByProduct filter(D_Rank == 1) ~> TopSalesByProduct",
+				"join2 select(mapColumn(",
+				"          FirstName,",
+				"          LastName,",
+				"          Least_SalesAmount = aggregate1@SalesAmount,",
+				"          {Top_ Product_Name} = { Product_Name}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> FinalLeast10Customers",
+				"Top10Customers, TopSalesByProductFinal join(DimCustomer@CustomerKey == aggregate2@CustomerKey,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> join3",
+				"join3 select(mapColumn(",
+				"          FirstName,",
+				"          LastName,",
+				"          Top_SalesAmount = aggregate1@SalesAmount,",
+				"          { Top_Product_Name} = { Product_Name}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> FinalTop10Customers",
+				"TopSalesByProduct derive({ Product_Name} = iifNull({ Product_Name}, 'Unknown_Product')) ~> TopSalesByProductFinal",
+				"FinalLeast10Customers sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Column_1 as string,",
+				"          Column_2 as string,",
+				"          Column_3 as string,",
+				"          Column_4 as string,",
+				"          Column_5 as string,",
+				"          Column_6 as string,",
+				"          Column_7 as string,",
+				"          Column_8 as string,",
+				"          Column_9 as string,",
+				"          Column_10 as string,",
+				"          Column_11 as string",
+				"     ),",
+				"     partitionFileNames:['FinalLeast10Customers.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     partitionBy('hash', 1)) ~> FinalLeast10CustomersCSV",
+				"FinalTop10Customers sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Column_1 as string,",
+				"          Column_2 as string,",
+				"          Column_3 as string,",
+				"          Column_4 as string,",
+				"          Column_5 as string,",
+				"          Column_6 as string,",
+				"          Column_7 as string,",
+				"          Column_8 as string,",
+				"          Column_9 as string,",
+				"          Column_10 as string,",
+				"          Column_11 as string",
+				"     ),",
+				"     partitionFileNames:['FinalTop10Customers.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 2,",
+				"     partitionBy('hash', 1)) ~> FinalTop10CustomersCSV"
+			]
+		}
+	}
+}

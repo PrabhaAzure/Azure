@@ -1,0 +1,19 @@
+{
+	"name": "EventBased_Copy",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/prabhakarcontainer/blobs/input/",
+			"blobPathEndsWith": ".txt",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/a62665bb-d7b7-44f6-9081-1e115745da72/resourceGroups/Prabhakar_Test/providers/Microsoft.Storage/storageAccounts/prabhakarkstorage",
+			"events": [
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
+			]
+		}
+	}
+}

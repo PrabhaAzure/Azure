@@ -1,0 +1,27 @@
+{
+	"name": "SQL_ADF_OUTPUT_FOLDER_TABLE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLServer_PrabhaDesktop",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FolderName",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ADF_OutputFolders"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

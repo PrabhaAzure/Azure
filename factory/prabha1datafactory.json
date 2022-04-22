@@ -1,0 +1,9 @@
+{
+	"name": "prabha1datafactory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "489d3d2c-028a-46dd-b3e6-7d27c3ca7a88",
+		"tenantId": "5b2cbc4a-4a82-47a0-932f-ba0857a5cbec"
+	}
+}

@@ -1,0 +1,140 @@
+{
+	"name": "DF_CBS_Above_Below_Sales",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DimCustomer_CSV",
+						"type": "DatasetReference"
+					},
+					"name": "DimCustomer"
+				},
+				{
+					"dataset": {
+						"referenceName": "FactSales_CSV",
+						"type": "DatasetReference"
+					},
+					"name": "FactSales"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CustomerBySalesDS",
+						"type": "DatasetReference"
+					},
+					"name": "SalesByCustomerAbove"
+				},
+				{
+					"dataset": {
+						"referenceName": "CustomerBySalesDS",
+						"type": "DatasetReference"
+					},
+					"name": "SalesByCustomerBelow"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FullName"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "join2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CustomerKey as string,",
+				"          Geographykey as string,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          BirthDate as string,",
+				"          EmailAddress as string,",
+				"          YearlyIncome as string,",
+				"          AddressLine1 as string,",
+				"          Phone as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DimCustomer",
+				"source(output(",
+				"          OrderDate as string,",
+				"          ProductKey as string,",
+				"          CustomerKey as string,",
+				"          OrderQuantity as string,",
+				"          UnitPrice as string,",
+				"          SalesAmount as string,",
+				"          TaxAmt as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> FactSales",
+				"DimCustomer derive(Customer_Name = rtrim(concat(coalesce(FirstName,''),' ',coalesce(LastName,'')))) ~> FullName",
+				"FullName, split1@SalesAbove1000 join(DimCustomer@CustomerKey == split1@SalesAbove1000@CustomerKey,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> join1",
+				"FactSales split(toDecimal(SalesAmount) >= 1000,",
+				"     disjoint: false) ~> split1@(SalesAbove1000, SalesBelow1000)",
+				"split1@SalesBelow1000, FullName join(split1@SalesBelow1000@CustomerKey == DimCustomer@CustomerKey,",
+				"     joinType:'inner',",
+				"     broadcast: 'auto')~> join2",
+				"join1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Column_1 as string,",
+				"          Column_2 as string,",
+				"          Column_3 as string,",
+				"          Column_4 as string,",
+				"          Column_5 as string,",
+				"          Column_6 as string,",
+				"          Column_7 as string,",
+				"          Column_8 as string,",
+				"          Column_9 as string,",
+				"          Column_10 as string,",
+				"          Column_11 as string",
+				"     ),",
+				"     partitionFileNames:['SalesByCustomerAbove.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Customer_Name,",
+				"          OrderDate,",
+				"          OrderQuantity,",
+				"          UnitPrice,",
+				"          SalesAmount,",
+				"          TaxAmt",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> SalesByCustomerAbove",
+				"join2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Column_1 as string,",
+				"          Column_2 as string,",
+				"          Column_3 as string,",
+				"          Column_4 as string,",
+				"          Column_5 as string,",
+				"          Column_6 as string,",
+				"          Column_7 as string,",
+				"          Column_8 as string,",
+				"          Column_9 as string,",
+				"          Column_10 as string,",
+				"          Column_11 as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Customer_Name,",
+				"          SalesAmount,",
+				"          TaxAmt",
+				"     )) ~> SalesByCustomerBelow"
+			]
+		}
+	}
+}

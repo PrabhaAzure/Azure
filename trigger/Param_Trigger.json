@@ -1,0 +1,33 @@
+{
+	"name": "Param_Trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pipeline2",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"S_table": "STavle",
+					"T_Table": "TTable",
+					"Server_P": "Server",
+					"DB_P": "db",
+					"user_P": "user",
+					"password_P": "pw",
+					"schema_P": "dbo"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-04-01T10:25:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

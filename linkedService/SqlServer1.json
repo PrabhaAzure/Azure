@@ -1,0 +1,25 @@
+{
+	"name": "SqlServer1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"DBName": {
+				"type": "string"
+			},
+			"ServerName": {
+				"type": "string"
+			},
+			"userName": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DBName};User ID=@{linkedService().userName};Password=@{linkedService().password}"
+		}
+	}
+}

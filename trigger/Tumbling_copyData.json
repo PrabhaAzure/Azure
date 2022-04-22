@@ -1,0 +1,20 @@
+{
+	"name": "Tumbling_copyData",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"type": "TumblingWindowTrigger",
+		"typeProperties": {
+			"frequency": "Hour",
+			"interval": 5,
+			"startTime": "2022-03-30T06:08:00Z",
+			"endTime": "2022-03-31T06:08:00Z",
+			"delay": "00:00:00",
+			"maxConcurrency": 2,
+			"retryPolicy": {
+				"intervalInSeconds": 30
+			},
+			"dependsOn": []
+		}
+	}
+}

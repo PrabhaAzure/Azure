@@ -1,0 +1,55 @@
+{
+	"name": "Web",
+	"properties": {
+		"activities": [
+			{
+				"name": "GET",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://reqres.in/api/users?page=2",
+					"method": "GET"
+				}
+			},
+			{
+				"name": "POST",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GET",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://reqres.in/api/users",
+					"method": "POST",
+					"body": {
+						"name": "Prabhakar",
+						"job": "Naruto"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-04-13T13:15:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

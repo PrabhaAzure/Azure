@@ -1,0 +1,16 @@
+{
+	"name": "SQLServer_PrabhaDesktop",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=DESKTOP-L8M6FM4;initial catalog=Test;user id=ADF_USER",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIzMjFkMDBhYS00MmIxLTRhZjYtOTBmMi1jMjllMjcyZTk4NGMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "IR-SelfHosted",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
